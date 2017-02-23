@@ -21,3 +21,13 @@
 
 en:
   hello: "Hello world"
+  import:
+    title: Import data from CSV
+    file_is_missing: File is missing
+  activerecord:
+    attributes:
+      product:
+        
+        created: 'Product was successfully created.'
+        updated: 'Product was successfully updated.'
+        destroyed: 'Product was successfully destroyed.'

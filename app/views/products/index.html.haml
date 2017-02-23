@@ -1,0 +1,31 @@
+.col-md-12.form-group
+  = form_tag import_products_path, multipart: true, class: "import-form form-row" do
+    .col-md-6.form-row
+      = file_field_tag :file, class: "pull-left", title: "#{t 'import.title'}"
+      = submit_tag "#{t 'import.title'}", class: "btn btn-success import-button"
+.clearfix
+%hr/
+.clearfix
+.product-list-container
+  %table#myTable.table.table-striped
+    %thead
+      %tr
+        %th 
+        %th.first-column Name
+        %th Price
+        %th Campaign
+        %th Brand
+        %th
+    %tbody
+      - @products.each do |product|
+        %tr
+          %td
+            = image_tag product.images.first.url if product.images.present?
+          %td= product.title
+          %td= product.price
+          %td= product.campaign.try(:name)
+          %td= product.brand.try(:name)
+          %td
+            = link_to t('common.show'), product, class: "btn btn-primary btn-sm"
+            = link_to t('common.edit'), edit_product_path(product), class: "btn btn-default btn-sm"
+            = link_to t('common.delete'), product_path(product), method: :delete, :data => { :confirm => t('common.confirm') }, class: "btn btn-danger btn-sm"

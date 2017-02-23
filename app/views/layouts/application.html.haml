@@ -1,0 +1,37 @@
+!!! XML
+!!!
+%html{:lang => "en"}
+  %head
+    = stylesheet_link_tag  'application', media: 'all'
+    %meta{name: "viewport", content: "width=device-width, user-scalable=no"}
+    = javascript_include_tag 'application'
+    = csrf_meta_tags
+  %body
+    .navbar-wrapper
+      %nav.navbar.navbar-inverse.navbar-static-top.text-right
+        .container
+          .row
+            .col-md-4
+              .navbar-header
+                %button.navbar-toggle.collapsed{"aria-controls" => "navbar", "aria-expanded" => "false", "data-target" => "#navbar", "data-toggle" => "collapse", :type => "button"}
+                  %span.sr-only Toggle navigation
+                  %span.icon-bar
+                  %span.icon-bar
+                  %span.icon-bar
+            .col-md-12
+              #navbar.navbar-collapse.collapse
+                %ul.nav.navbar-nav
+                  %li
+                    = link_to "Home", root_path
+                  %li
+                    = link_to "Products", products_path
+    .container
+      = yield
+    / Footer
+    .container
+      %hr.featurette-divider
+      / FOOTER
+      %footer
+        .col-md-4
+        .col-md-4.text-center
+          © 2017 @ 2Performant, Inc. ·
