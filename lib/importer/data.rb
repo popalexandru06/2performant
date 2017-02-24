@@ -20,6 +20,7 @@ module Importer
         # Initialize new product and new Campaign
         product = Product.new()
         campaign = Campaign.new()
+        product_images_url = []
 
         get_csv_header[:file_columns].each_with_index do |csv_column, index|
           # Find db_column based on csv_column name
@@ -46,9 +47,8 @@ module Importer
             campaign[campaign_db_column] = row[index]
           end
 
-          
           if (csv_column == "image_urls")
-            
+            product_images_url = row[index].split(",")
           end
           
         end
@@ -67,9 +67,17 @@ module Importer
         old_product = product[:source_id].present? ? Product.find_by(source_id: product[:source_id]) : nil
         if old_product.present? && product[:source_id].present?
           old_product.update(product.attributes.except("id", "created_at", "updated_at"))
+          if product_images_url.present?
+            old_product.images.delete_all 
+            old_product.images = product_images_url.map { |i| Image.new(url: i) }
+            old_product.save
+          end
         else
-          product.save!
+          product.images = product_images_url.map { |i| Image.new(url: i) } if product_images_url.present?
+          product.save
         end
+
+
       end
 
       File.delete(@file_name) if @delete_file

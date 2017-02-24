@@ -1,5 +1,7 @@
 class ProductsController < ApplicationController
   require 'csv'
+  before_action :set_product, only: [:show, :edit, :update, :destroy]
+
   def index
     @products = Product.all.paginate(page: params[:page])
   end
@@ -8,14 +10,14 @@ class ProductsController < ApplicationController
   end
 
   def new
-    @product = product.new
+    @product = Product.new
   end
 
   def edit
   end
 
   def create
-    @product = product.new(product_params)
+    @product = Product.new(product_params)
 
     respond_to do |format|
       if @product.save
@@ -45,7 +47,7 @@ class ProductsController < ApplicationController
 
   def import
     Delayed::Job.enqueue(ImportJob.new(session[:file_path], params))
-
+    
     redirect_to products_path, notice: t('import.in_progress')
   end
 
@@ -82,7 +84,7 @@ class ProductsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_product
-      @product = product.find(params[:id])
+      @product = Product.find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

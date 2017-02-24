@@ -38,3 +38,6 @@ en:
         created: 'Product was successfully created.'
         updated: 'Product was successfully updated.'
         destroyed: 'Product was successfully destroyed.'
+  common:
+    save: Save
+    new_product: New product

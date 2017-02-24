@@ -1,8 +1,10 @@
-.col-md-12.form-group
+.col-md-8.form-group
   = form_tag map_fields_products_path, multipart: true, class: "import-form form-row" do
-    .col-md-6.form-row
-      = file_field_tag :file, accept: 'text/csv', class: "pull-left", title: "#{t 'import.title'}"
-      = submit_tag "#{t 'import.title'}", class: "btn btn-success import-button"
+    = file_field_tag :file, accept: 'text/csv', class: "pull-left", title: "#{t 'import.title'}"
+    = submit_tag "#{t 'import.title'}", class: "btn btn-success import-button"
+    = link_to "Download CSV example file", "feed_data.csv", class: "btn btn-info"
+.col-md-4.form-group.text-right
+  = link_to t('common.new_product'), new_product_path, class: "btn btn-success"
 .clearfix
 %hr/
 .clearfix
