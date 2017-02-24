@@ -26,6 +26,7 @@
                   %li
                     = link_to "Products", products_path
     .container
+      = render partial: "partials/flash_messages"
       = yield
     / Footer
     .container

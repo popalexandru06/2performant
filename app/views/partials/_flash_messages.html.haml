@@ -1,0 +1,7 @@
+#flash_message.form-group
+  - if flash[:alert].present?
+    .alert.alert-danger
+      = flash[:alert]
+  - if flash[:notice].present?
+    .alert.alert-success
+      = flash[:notice]
