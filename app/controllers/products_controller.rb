@@ -44,8 +44,7 @@ class ProductsController < ApplicationController
   end
 
   def import
-    importer = Importer::Data.new(session[:file_path], params)
-    importer.import_products
+    Delayed::Job.enqueue(ImportJob.new(session[:file_path], params))
 
     redirect_to products_path, notice: t('import.in_progress')
   end
