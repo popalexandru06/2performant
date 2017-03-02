@@ -1,6 +1,10 @@
 = form_tag map_fields_products_path, class: "map-fields-form form-row" do
   .col-md-12.form-group
     %h2 Product details
+
+  .col-md-6.form-group
+    %label= t 'activerecord.attributes.product.source_id'
+    = select_tag "product[source_id]", options_for_select(@select_options, @file_columns.include?('product_id') ? 'product_id' : nil ), class: "form-control", prompt: "Please Select"
   .col-md-6.form-group
     %label= t 'activerecord.attributes.product.source_id'
     = select_tag "product[source_id]", options_for_select(@select_options, @file_columns.include?('product_id') ? 'product_id' : nil ), class: "form-control", prompt: "Please Select"
