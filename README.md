@@ -9,12 +9,15 @@ Things you may want to cover:
   rvm install ruby-2.3.0-perf
 
 * Database creation
+  
   Create a file in config/database.yml after the example that it is in config/database.yml.example
 
 * Database initialization
-  rake db:create
-  rake db:migrate
-  rake db:seed
+```rb
+rake db:setup
+rake db:seed
+rake jobs:work - to run delayed jobs locally
+```
 
 * How to run the test suite
 
