@@ -56,6 +56,7 @@ class ProductsController < ApplicationController
 
       response = Importer::Data.new(session[:file_path])
       @file_columns = response.get_csv_header
+      @select_options = @file_columns.map{|i| [i.humanize, i]}
       @product_columns = Product.column_names - ["id", "created_at", "updated_at", "campaign_id", "brand_id", "widget_id", "subcategory_id"]     
     else
       respond_to do |format|
