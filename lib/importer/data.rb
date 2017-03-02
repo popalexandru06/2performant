@@ -10,47 +10,41 @@ module Importer
     end
 
     def import_products
-      file = File.open(@file_name)
-      content = file.read
-      i = 0
-      CSV.parse( content) do |row|
-        # Skip first line which contains the header
-        i += 1
-        next if (i == 1)
-        # Initialize new product and new Campaign
+
+      CSV.foreach(@file_name, headers: true) do |row|
+
         product = Product.new()
         campaign = Campaign.new()
         product_images_url = []
 
-        get_csv_header[:file_columns].each_with_index do |csv_column, index|
+        row.each do |cell|
           # Find db_column based on csv_column name
-          db_column = @params[:product].find{|i| i[1] == csv_column}.try(:first)
-          product[db_column] = row[index] if db_column.present?
+          db_column = @params[:product].find{|i| i[1] == cell[0]}.try(:first)
+          product[db_column] = cell[1] if db_column.present?
 
           # If there is brand column in csv
-          brand_db_column = @params[:brand].find{|i| i[1] == csv_column}.try(:first)
+          brand_db_column = @params[:brand].find{|i| i[1] == cell[0]}.try(:first)
           if @params[:brand].present? && brand_db_column.present?
-            brand = Brand.find_or_create_by(name: row[index])
+            brand = Brand.find_or_create_by(name: cell[1])
             product[:brand_id] = brand.id
           end
 
           # If there is brand column in csv
-          widget_db_column = @params[:widget].find{|i| i[1] == csv_column}.try(:first)
+          widget_db_column = @params[:widget].find{|i| i[1] == cell[0]}.try(:first)
           if @params[:widget].present? && brand_db_column.present?
-            widget = Widget.find_or_create_by(name: row[index])
+            widget = Widget.find_or_create_by(name: cell[1])
             product[:widget_id] = widget.id
           end
 
           # If there is campaign column in csv
-          campaign_db_column = @params[:campaign].find{|i| i[1] == csv_column}.try(:first)
+          campaign_db_column = @params[:campaign].find{|i| i[1] == cell[0]}.try(:first)
           if @params[:campaign].present? && campaign_db_column.present?
-            campaign[campaign_db_column] = row[index]
+            campaign[campaign_db_column] = cell[1]
           end
 
-          if (csv_column == "image_urls")
-            product_images_url = row[index].split(",")
+          if (cell[0] == "image_urls")
+            product_images_url = cell[1].split(",")
           end
-          
         end
 
         # Check if there is already a campaign with same source id
@@ -76,37 +70,21 @@ module Importer
           product.images = product_images_url.map { |i| Image.new(url: i) } if product_images_url.present?
           product.save
         end
-
-
       end
 
       File.delete(@file_name) if @delete_file
     end
 
     def get_csv_header 
-      response = { success: true }
-      begin
-        file_columns = []
+      file_columns = []
 
-        file = File.open(@file_name)
-        content = file.read
-        CSV.parse( content) do |row|
-          row.each do |attribute|
-            attribute_lowcase = attribute.downcase.gsub(" ","_")
-            file_columns.push(attribute_lowcase)
-          end
-          break
-        end
-        response[:file_columns] = file_columns
-
-      rescue Exception => e
-        response = unless Rails.env.production?
-          { success: false, line: 'unknown', message: "CSV parse error: " + e.message + "<br />" + e.backtrace.inspect }
-        else
-          { success: false, line: 'unknown', message: "Some error occured." }
-        end
+      file = File.open(@file_name)
+      row = CSV.read(file, headers: true).headers
+      row.each do |attribute|
+        file_columns.push(attribute.downcase.gsub(" ","_"))
       end
-      response
+      
+      file_columns
     end
 
   end

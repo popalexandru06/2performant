@@ -46,37 +46,20 @@ class ProductsController < ApplicationController
   end
 
   def import
-    Delayed::Job.enqueue(ImportJob.new(session[:file_path], params))
-    
+    Delayed::Job.enqueue(ImportJob.new(session[:file_path], params))    
     redirect_to products_path, notice: t('import.in_progress')
   end
 
   def map_fields
-    file = params[:file]
-    if file.present?
-      if file.original_filename.include? ".csv"
-        file_name = file.original_filename
-        file_path = "tmp/#{file_name}"
+    if params[:file].present? && params[:file].original_filename.include?(".csv")
+      create_tmp_file params[:file]
 
-        tmp_file = File.open( file_path, "wb")
-        tmp_file.write( file.read )
-        tmp_file.close
-
-        session[:file_path] = file_path
-
-        response = Importer::Data.new(session[:file_path])
-        response = response.get_csv_header
-
-        @file_columns = response[:file_columns]
-        @select_options = @file_columns.map{|i| [i.humanize, i]}    
-      else
-        respond_to do |format|
-          format.html { redirect_to products_url, alert: t('import.choose_a_csv_file') }  
-        end
-      end
+      response = Importer::Data.new(session[:file_path])
+      @file_columns = response.get_csv_header
+      @select_options = @file_columns.map{|i| [i.humanize, i]}    
     else
       respond_to do |format|
-        format.html { redirect_to products_url, alert: t('import.file_is_missing') }
+        format.html { redirect_to products_url, alert: (params[:file].present? ? t('import.choose_a_csv_file') : t('import.file_is_missing'))}
       end
     end
   end
@@ -90,5 +73,14 @@ class ProductsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def product_params
       params.require(:product).permit(:title, :aff_code, :price, :campaign_id, :widget_id, :short_message, :source_id, :brand_id, :is_active)
+    end
+
+    def create_tmp_file file
+      file_path = "tmp/#{file.original_filename}"
+      tmp_file = File.open( file_path, "wb")
+      tmp_file.write( file.read )
+      tmp_file.close
+
+      session[:file_path] = file_path
     end
 end
