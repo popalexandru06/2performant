@@ -38,6 +38,12 @@ en:
         created: 'Product was successfully created.'
         updated: 'Product was successfully updated.'
         destroyed: 'Product was successfully destroyed.'
+      widget:
+        name: Widget name
+      brand:
+        name: Brand
+      image:
+        urls: Image urls
   common:
     save: Save
     new_product: New product

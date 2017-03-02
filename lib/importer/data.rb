@@ -18,30 +18,11 @@ module Importer
         product_images_url = []
 
         row.each do |cell|
-          # Find db_column based on csv_column name
-          db_column = @params[:product].find{|i| i[1] == cell[0]}.try(:first)
-          product[db_column] = cell[1] if db_column.present?
-
-          # If there is brand column in csv
-          brand_db_column = @params[:brand].find{|i| i[1] == cell[0]}.try(:first)
-          if @params[:brand].present? && brand_db_column.present?
-            brand = Brand.find_or_create_by(name: cell[1])
-            product[:brand_id] = brand.id
-          end
-
-          # If there is brand column in csv
-          widget_db_column = @params[:widget].find{|i| i[1] == cell[0]}.try(:first)
-          if @params[:widget].present? && brand_db_column.present?
-            widget = Widget.find_or_create_by(name: cell[1])
-            product[:widget_id] = widget.id
-          end
-
-          # If there is campaign column in csv
-          campaign_db_column = @params[:campaign].find{|i| i[1] == cell[0]}.try(:first)
-          if @params[:campaign].present? && campaign_db_column.present?
-            campaign[campaign_db_column] = cell[1]
-          end
-
+          find_values_to_product_attributes cell, product
+          find_and_create_widget cell, product
+          find_and_create_brand cell, product
+          find_values_for_campaign cell, campaign
+          
           if (cell[0] == "image_urls")
             product_images_url = cell[1].split(",")
           end
@@ -85,6 +66,38 @@ module Importer
       end
       
       file_columns
+    end
+
+    def find_values_to_product_attributes cell, product
+      # Find db_column based on csv_column name
+      db_column = @params[:product].find{|i| i[1] == cell[0]}.try(:first)
+      product[db_column] = cell[1] if db_column.present?
+    end
+
+    def find_and_create_widget cell, product
+      # If there is widget column in csv
+      widget_db_column = @params[:widget].find{|i| i[1] == cell[0]}.try(:first)
+      if @params[:widget].present? && widget_db_column.present?
+        widget = Widget.find_or_create_by(name: cell[1])
+        product[:widget_id] = widget.id
+      end
+    end
+
+    def find_and_create_brand cell, product
+      # If there is brand column in csv
+      brand_db_column = @params[:brand].find{|i| i[1] == cell[0]}.try(:first)
+      if @params[:brand].present? && brand_db_column.present?
+        brand = Brand.find_or_create_by(name: cell[1])
+        product[:brand_id] = brand.id
+      end
+    end
+
+    def find_values_for_campaign  cell, campaign
+      # If there is campaign column in csv
+      campaign_db_column = @params[:campaign].find{|i| i[1] == cell[0]}.try(:first)
+      if @params[:campaign].present? && campaign_db_column.present?
+        campaign[campaign_db_column] = cell[1]
+      end
     end
 
   end
