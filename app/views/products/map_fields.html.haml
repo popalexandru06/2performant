@@ -1,0 +1,46 @@
+= form_tag import_products_path, class: "map-fields-form form-row" do
+  .col-md-12.form-group
+    %h2 Product details
+  - if !@file_columns.include?('product_id')
+    .col-md-12
+      .alert.alert-danger
+        = t 'import.product_source_id_missing'
+  - Product::COLUMNS_FOR_IMPORT.each do |column|
+    .col-md-6.form-group
+      %label= t "activerecord.attributes.product.#{column}"
+      = generate_product_select_tag(column, @file_columns)
+
+  - Brand::COLUMNS_FOR_IMPORT.each do |column|
+    .col-md-6.form-group
+      %label= t "activerecord.attributes.brand.#{column}"
+      = generate_select_tag(column, @file_columns, "brand")
+
+  - Widget::COLUMNS_FOR_IMPORT.each do |column|
+    .col-md-6.form-group
+      %label= t "activerecord.attributes.widget.#{column}"
+      = generate_select_tag(column, @file_columns, "widget")
+
+  - Image::COLUMNS_FOR_IMPORT.each do |column|
+    .col-md-6.form-group
+      %label= t "activerecord.attributes.image.#{column}"
+      = generate_select_tag(column, @file_columns, "image")
+
+  .col-md-12
+    %hr/
+  .col-md-12
+    %h2 Campaign details
+  - if !@file_columns.include?('campaign_id')
+    .col-md-12
+      .alert.alert-danger
+        = t 'import.campaign_source_id_missing'
+  - Campaign::COLUMNS_FOR_IMPORT.each do |column|
+    .col-md-4.form-group
+      %label= t "activerecord.attributes.campaign.#{column}"
+      = generate_select_tag(column, @file_columns, "campaign")
+  .col-md-12
+    %hr/
+
+  .col-md-12.form-group
+    = link_to t('general.back'), products_path, class: "btn btn-default"
+    = submit_tag "#{t 'import.title'}", class: "btn btn-success"
+  .col-md-12

@@ -6,14 +6,18 @@ application up and running.
 Things you may want to cover:
 
 * Ruby version
-
-* System dependencies
-
-* Configuration
+  rvm install ruby-2.3.0-perf
 
 * Database creation
+  
+  Create a file in config/database.yml after the example that it is in config/database.yml.example
 
 * Database initialization
+```rb
+rake db:setup
+rake db:seed
+rake jobs:work - to run delayed jobs locally
+```
 
 * How to run the test suite
 

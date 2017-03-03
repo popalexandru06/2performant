@@ -21,3 +21,32 @@
 
 en:
   hello: "Hello world"
+  import:
+    title: Import data from CSV
+    file_is_missing: File is missing
+    in_progress: File import will be done in background. You'll receive an email when the import is finish.
+    product_source_id_missing: Source id of the products is missing from your file. This means that your products can't be verified if there are already in the database so maybe will you'll have duplicates after this import
+    campaign_source_id_missing: Source id of the campaigns is missing from your file. This means that your campaigns can't be verified if there are already in the database so will you'll have duplicates after this import
+    choose_a_csv_file: Import can be done only from CSV files.
+    file_is_missing: Please select a file first.
+  activerecord:
+    attributes:
+      campaign: 
+        source_id: Source id
+      product:
+        source_id: Source id
+        created: 'Product was successfully created.'
+        updated: 'Product was successfully updated.'
+        destroyed: 'Product was successfully destroyed.'
+        validation_error: 
+          one: "1 error prohibited this video from being saved"
+          other: "%{count} errors prohibited this video from being saved"
+      widget:
+        name: Widget name
+      brand:
+        name: Brand
+      image:
+        urls: Image urls
+  common:
+    save: Save
+    new_product: New product

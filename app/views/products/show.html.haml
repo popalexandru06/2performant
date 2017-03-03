@@ -1,0 +1,34 @@
+.page-header
+  %h1= @product.title
+.col-md-6.text-center
+  = image_tag @product.images.first.url, class: "img-responsive" if @product.images.present?
+.col-md-6
+  .form-group.text-right
+    %h1.product-price
+      = t('activerecord.attributes.product.price') + ":"
+      %span= @product.price
+  %table.table.table-striped.product-table
+    %tbody
+      %tr
+        %td= t 'activerecord.attributes.product.is_active'
+        %td= @product.is_active
+      %tr
+        %td= t 'activerecord.attributes.product.old_price'
+        %td= @product.old_price
+      %tr
+        %td= t 'activerecord.attributes.product.aff_code'
+        %td= @product.aff_code
+      %tr
+        %td= t 'activerecord.attributes.product.brand'
+        %td= @product.brand.try(:name)
+      %tr
+        %td= t 'activerecord.attributes.product.campaign'
+        %td= @product.campaign.try(:name)
+      %tr
+        %td= t 'activerecord.attributes.product.widget'
+        %td= @product.widget.try(:name)
+.col-md-12
+  %hr/
+.col-md-12
+  %h4= t 'activerecord.attributes.product.description'
+  %p= @product.description
