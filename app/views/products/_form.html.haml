@@ -1,4 +1,11 @@
 = form_for @product do |f|
+  - if @product.errors.any?
+    .col-md-12
+      .alert.alert-danger#error_explanation
+        %h2= t('activerecord.attributes.product.validation_error', :count => @product.errors.count)
+        %ul
+          - @product.errors.full_messages.each do |msg|
+            %li= msg  
   .col-md-6.form-group
     = f.label :source_id, t('activerecord.attributes.product.source_id')
     = f.text_field :source_id, class: "form-control"
@@ -13,10 +20,10 @@
     = f.text_field :aff_code, class: "form-control"
   .col-md-6.form-group
     = f.label :price, t('activerecord.attributes.product.price')
-    = f.text_field :price, class: "form-control"
+    = f.number_field :price, class: "form-control"
   .col-md-6.form-group
     = f.label :old_price, t('activerecord.attributes.product.old_price')
-    = f.text_field :old_price, class: "form-control"
+    = f.number_field :old_price, class: "form-control"
   .col-md-6.form-group
     = f.label :short_message, t('activerecord.attributes.product.short_message')
     = f.text_field :short_message, class: "form-control"

@@ -38,6 +38,9 @@ en:
         created: 'Product was successfully created.'
         updated: 'Product was successfully updated.'
         destroyed: 'Product was successfully destroyed.'
+        validation_error: 
+          one: "1 error prohibited this video from being saved"
+          other: "%{count} errors prohibited this video from being saved"
       widget:
         name: Widget name
       brand:

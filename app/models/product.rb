@@ -9,4 +9,6 @@ class Product < ApplicationRecord
   has_many :images
 
   validates_uniqueness_of :source_id, allow_blank: true
+  validates_numericality_of :price, :allow_nil => true, :greater_than_or_equal_to => 0
+  validates_numericality_of :old_price, :allow_nil => true, :greater_than_or_equal_to => 0
 end
