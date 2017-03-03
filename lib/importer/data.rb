@@ -74,12 +74,9 @@ module Importer
         campaign_maped_column = @params[:campaign][campaign_column]
         campaign_params[campaign_column] = row[campaign_maped_column] if row[campaign_maped_column].present?
       end
-      if row["campaign_id"].present?
+      if campaign_params.present?
         campaign = Campaign.find_or_initialize_by(source_id: row["campaign_id"])
         campaign.update_attributes(campaign_params)
-        campaign_id = campaign.id
-      else
-        campaign = Campaign.create(campaign_params)
         campaign_id = campaign.id
       end
       campaign_id
