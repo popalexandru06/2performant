@@ -10,95 +10,88 @@ module Importer
     end
 
     def import_products
-
       CSV.foreach(@file_name, headers: true) do |row|
-
-        product = Product.new()
-        campaign = Campaign.new()
-        product_images_url = []
-
-        row.each do |cell|
-          find_values_to_product_attributes cell, product
-          find_and_create_widget cell, product
-          find_and_create_brand cell, product
-          find_values_for_campaign cell, campaign
-          
-          if (cell[0] == "image_urls")
-            product_images_url = cell[1].split(",")
-          end
-        end
-
-        # Check if there is already a campaign with same source id
-        old_campaign = campaign[:source_id].present? ? Campaign.find_by(source_id: campaign[:source_id]) : nil
-        if old_campaign.present?
-          old_campaign.update(campaign.attributes.except("id", "created_at", "updated_at"))
-          product[:campaign_id] = old_campaign.id
-        else
-          campaign.save if @params[:campaign].present?
-          product[:campaign_id] = campaign.id
-        end
-
-        # Check if there is already a product with same source id
-        old_product = product[:source_id].present? ? Product.find_by(source_id: product[:source_id]) : nil
-        if old_product.present? && product[:source_id].present?
-          old_product.update(product.attributes.except("id", "created_at", "updated_at"))
-          if product_images_url.present?
-            old_product.images.delete_all 
-            old_product.images = product_images_url.map { |i| Image.new(url: i) }
-            old_product.save
-          end
-        else
-          product.images = product_images_url.map { |i| Image.new(url: i) } if product_images_url.present?
-          product.save
-        end
+        product = find_values_for_product row
+        product[:widget_id] = find_and_create_widget row
+        product[:brand_id] = find_and_create_brand row
+        product[:campaign_id] = find_and_create_campaign row
+        product.save        
+        asign_images_to_product product, row   
       end
-
       File.delete(@file_name) if @delete_file
     end
 
     def get_csv_header 
       file_columns = []
-
       file = File.open(@file_name)
       row = CSV.read(file, headers: true).headers
       row.each do |attribute|
         file_columns.push(attribute.downcase.gsub(" ","_"))
       end
-      
       file_columns
     end
 
-    def find_values_to_product_attributes cell, product
-      # Find db_column based on csv_column name
-      db_column = @params[:product].find{|i| i[1] == cell[0]}.try(:first)
-      product[db_column] = cell[1] if db_column.present?
+    def find_values_for_product row
+      product_params = {}
+      Product::COLUMNS_FOR_IMPORT.each do |product_column|
+        product_maped_column = @params[:product][product_column]
+        product_params[product_column] = row[product_maped_column] if row[product_maped_column].present?
+      end
+      if row["product_id"].present?
+        product = Product.find_or_initialize_by(source_id: row["product_id"])
+        product.update_attributes(product_params)
+      else
+        product = Product.create(product_params)
+      end
+      product
     end
 
-    def find_and_create_widget cell, product
-      # If there is widget column in csv
-      widget_db_column = @params[:widget].find{|i| i[1] == cell[0]}.try(:first)
-      if @params[:widget].present? && widget_db_column.present?
-        widget = Widget.find_or_create_by(name: cell[1])
-        product[:widget_id] = widget.id
+    def find_and_create_widget row
+      widget_id = nil
+      if @params[:widget].present?
+        widget_maped_column = @params[:widget][:name]
+        widget = Widget.find_or_create_by(name: row[widget_maped_column]) if row[widget_maped_column].present?
+        widget_id = widget.id if widget.present?
+      end
+      widget_id
+    end
+
+    def find_and_create_brand row
+      brand_id = nil
+      if @params[:brand].present?
+        brand_maped_column = @params[:brand][:name]
+        brand = Brand.find_or_create_by(name: row[brand_maped_column]) if row[brand_maped_column].present?
+        brand_id = brand.id if brand.present?
+      end
+      brand_id
+    end
+
+    def find_and_create_campaign row
+      campaign_params = {}
+      campaign_id = nil
+      
+      Campaign::COLUMNS_FOR_IMPORT.each do |campaign_column|
+        campaign_maped_column = @params[:campaign][campaign_column]
+        campaign_params[campaign_column] = row[campaign_maped_column] if row[campaign_maped_column].present?
+      end
+      if row["campaign_id"].present?
+        campaign = Campaign.find_or_initialize_by(source_id: row["campaign_id"])
+        campaign.update_attributes(campaign_params)
+        campaign_id = campaign.id
+      else
+        campaign = Campaign.create(campaign_params)
+        campaign_id = campaign.id
+      end
+      campaign_id
+    end
+
+    def asign_images_to_product product, row
+      if @params[:image].present? && row[@params[:image][:urls]].present?
+        product.images.delete_all
+        product_images_url = row[@params[:image][:urls]].split(",")
+        product.images = product_images_url.map { |i| Image.new(url: i) }
+        product.save
       end
     end
-
-    def find_and_create_brand cell, product
-      # If there is brand column in csv
-      brand_db_column = @params[:brand].find{|i| i[1] == cell[0]}.try(:first)
-      if @params[:brand].present? && brand_db_column.present?
-        brand = Brand.find_or_create_by(name: cell[1])
-        product[:brand_id] = brand.id
-      end
-    end
-
-    def find_values_for_campaign  cell, campaign
-      # If there is campaign column in csv
-      campaign_db_column = @params[:campaign].find{|i| i[1] == cell[0]}.try(:first)
-      if @params[:campaign].present? && campaign_db_column.present?
-        campaign[campaign_db_column] = cell[1]
-      end
-    end
-
   end
 end
